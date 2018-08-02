@@ -1,4 +1,4 @@
-FROM java:8-jdk
+FROM openjdk:8-jdk-alpine
 
 LABEL maintainer="Roy Kim <roy.kim@navercorp.com>"
 
@@ -14,7 +14,9 @@ ENV HBASE_HOME=${BASE_DIR}/hbase-${HBASE_VERSION}
 
 COPY hbase-site.xml hbase-site.xml
 
-RUN mkdir -p ${BASE_DIR} \
+RUN apk add --no-cache bash \
+    && apk add --virtual=build-deps curl \
+    && mkdir -p ${BASE_DIR} \
     && cd ${BASE_DIR} \
     && curl -fSL "${HBASE_REPOSITORY}/${HBASE_VERSION}/hbase-${HBASE_VERSION}-bin.tar.gz" -o hbase.tar.gz || curl -fSL "${HBASE_SUB_REPOSITORY}/${HBASE_VERSION}/hbase-${HBASE_VERSION}-bin.tar.gz" -o hbase.tar.gz \
     && tar xfvz hbase.tar.gz \
@@ -25,7 +27,8 @@ RUN mkdir -p ${BASE_DIR} \
     && ${HBASE_HOME}/bin/hbase shell ${BASE_DIR}/hbase-create.hbase \
     && ${HBASE_HOME}/bin/stop-hbase.sh \
     && rm ${BASE_DIR}/hbase-create.hbase \
-    && rm -rf hbase.tar.gz
+    && rm -rf hbase.tar.gz \
+    && apk del build-deps
 
 VOLUME ["/home/pinpoint/hbase", "/home/pinpoint/zookeeper"]
 

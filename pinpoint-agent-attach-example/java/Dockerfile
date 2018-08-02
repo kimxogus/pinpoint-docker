@@ -1,4 +1,4 @@
-FROM java:8
+FROM openjdk:8-jre-alpine
 
 LABEL maintainer="Roy Kim <roy.kim@navercorp.com>"
 
